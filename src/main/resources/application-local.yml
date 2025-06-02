@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: eric-jarvasian
+#排除默认的dashscope配置，运行Ollama时启用
+#  autoconfigure:
+#    exclude: com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration
+#LLM配置
+  ai:
+    dashscope:
+      api-key: sk-34bb799af25340cb9bf73b84d6887fbd
+      chat:
+        options:
+          model: qwen-turbo
+
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: qwen3:0.6b
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: com.eric.ericjarvasian.controller
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+
+
