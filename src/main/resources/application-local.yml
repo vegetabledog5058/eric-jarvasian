@@ -40,5 +40,10 @@ knife4j:
   setting:
     language: zh_cn
 
+logging:
+  level:
+    com.eric.ericjarvasian.advisor: DEBUG
+    org.springframework.ai.chat.client.advisor: DEBUG
+
 
 
