@@ -38,4 +38,21 @@ class AgentAppTest {
         List<Generation> response = agentApp.chatForPrompt("hello", conversantId);
         assertNotNull(response);
     }
+
+    @Test
+    void chatWithRag() {
+        String conversantId = UUID.randomUUID().toString();
+        String response1 = agentApp.chatWithRag("我刚高考结束，报了计算机专业，大一我应该怎么学？", conversantId);
+        String response2 = agentApp.chatWithRag("我应该如何平衡学业与课外活动？", conversantId);
+        assertNotNull(response1);
+        assertNotNull(response2);
+
+    }
+
+    @Test
+    void chatWithCloudModel() {
+        String conversantId = UUID.randomUUID().toString();
+        String response = agentApp.chatWithCloudModel("计算机专业大三应该怎么规划?",  conversantId);
+        assertNotNull(response);
+    }
 }

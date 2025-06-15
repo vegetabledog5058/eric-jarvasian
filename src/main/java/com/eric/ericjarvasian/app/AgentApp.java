@@ -2,9 +2,12 @@ package com.eric.ericjarvasian.app;
 
 import com.eric.ericjarvasian.advisor.MyLoggerAdvisor;
 import com.eric.ericjarvasian.chatmemory.FileChatMemory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -13,6 +16,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -96,6 +100,8 @@ public class AgentApp {
                 .chatResponse()
                 .getResults();
         return response;
+
+
     }
 
 
@@ -111,4 +117,39 @@ public class AgentApp {
 
         return chatResponse;
     }
+
+    @Resource
+    private VectorStore vectorStore;
+
+    public String chatWithRag(String message, String conversantId) {
+
+        ChatResponse chatResponse = chatClient.prompt()
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .advisors((new QuestionAnswerAdvisor(vectorStore)))
+                .user(message)
+                .call()
+                .chatResponse();
+
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
+    }
+
+    //    云AI模型调用示例
+
+    @Resource
+    private RetrievalAugmentationAdvisor retrievalAugmentationAdvisor;
+
+    public String chatWithCloudModel(String message, String conversantId) {
+
+        String answer = chatClient.prompt()
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .advisors(retrievalAugmentationAdvisor)
+                .user(message)
+                .call().content();
+        return answer;
+    }
+
 }
