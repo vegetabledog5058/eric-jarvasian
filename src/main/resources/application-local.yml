@@ -5,7 +5,19 @@ spring:
 #  autoconfigure:
 #    exclude: com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAutoConfiguration
 #LLM配置
+#  PG vector 配置
+#  datasource:
+#    url: jdbc:postgresql://pgm-bp1pneg4snp48nbd4o.rwlb.rds.aliyuncs.com:5432/ericjarvasian
+#    username: "siyi"
+#    password: "@siyi5058"
+
   ai:
+#    vectorstore:
+#      pgvector:
+#        index-type: HNSW
+#        dimensions: 1536
+#        distance-type: COSINE_DISTANCE
+#        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
     dashscope:
       api-key: sk-34bb799af25340cb9bf73b84d6887fbd
       chat:

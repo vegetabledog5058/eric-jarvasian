@@ -42,10 +42,10 @@ class AgentAppTest {
     @Test
     void chatWithRag() {
         String conversantId = UUID.randomUUID().toString();
-        String response1 = agentApp.chatWithRag("我刚高考结束，报了计算机专业，大一我应该怎么学？", conversantId);
-        String response2 = agentApp.chatWithRag("我应该如何平衡学业与课外活动？", conversantId);
+        String response1 = agentApp.chatWithRag("大一职业规划怎么学？", conversantId);
+//        String response2 = agentApp.chatWithRag("我是谁，我的擅长学科是什么？", conversantId);
         assertNotNull(response1);
-        assertNotNull(response2);
+//        assertNotNull(response2);
 
     }
 

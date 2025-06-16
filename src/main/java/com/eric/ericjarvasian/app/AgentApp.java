@@ -2,6 +2,7 @@ package com.eric.ericjarvasian.app;
 
 import com.eric.ericjarvasian.advisor.MyLoggerAdvisor;
 import com.eric.ericjarvasian.chatmemory.FileChatMemory;
+import com.eric.ericjarvasian.rag.*;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -16,6 +17,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.rag.Query;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +41,7 @@ public class AgentApp {
         ChatMemory chatMemory = new FileChatMemory(directory);
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory),
+//                        new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor()
                         //reReadingAdvisor
 //                        new ReReadingAdvisor()
@@ -118,15 +120,37 @@ public class AgentApp {
         return chatResponse;
     }
 
-    @Resource
+    @Autowired
     private VectorStore vectorStore;
+    @Resource
+    private CpAppTranslationQueryTransformer cpAppTranslationQueryTransformer;
+    @Resource
+    private CpAppCompressionQueryTransformer cpAppCompressionQueryTransformer;
+    @Resource
+    private CpAppMultiQueryExpander cpAppMultiQueryExpander;
 
     public String chatWithRag(String message, String conversantId) {
+        //重写
+//        message = queryRewriter.doQueryRewrite(message);
+        // 压缩
+        String directory = System.getProperty("user.dir") + "/tem/chat_memory";
+        ChatMemory chatMemory = new FileChatMemory(directory);
+        List<Message> messages = chatMemory.get(conversantId, 10);
+        Query compress = cpAppCompressionQueryTransformer.compress(message, messages);
 
+
+        //查询拓展
+//        List<Query> expand = cpAppMultiQueryExpander.expand(message);
+
+        //翻译
+//        message = cpAppTranslationQueryTransformer.translate(message);
         ChatResponse chatResponse = chatClient.prompt()
-                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
-                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
-                .advisors((new QuestionAnswerAdvisor(vectorStore)))
+//                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
+//                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10)
+//                )
+                .advisors(CpAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
+                        vectorStore, "大一"))
+//                .advisors((new QuestionAnswerAdvisor(vectorStore)))
                 .user(message)
                 .call()
                 .chatResponse();
@@ -140,9 +164,13 @@ public class AgentApp {
 
     @Resource
     private RetrievalAugmentationAdvisor retrievalAugmentationAdvisor;
+    @Resource
+    private QueryRewriter queryRewriter;
 
     public String chatWithCloudModel(String message, String conversantId) {
 
+        //查询重写
+        message = queryRewriter.doQueryRewrite(message);
         String answer = chatClient.prompt()
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
@@ -151,5 +179,6 @@ public class AgentApp {
                 .call().content();
         return answer;
     }
+
 
 }

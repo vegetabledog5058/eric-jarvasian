@@ -30,18 +30,21 @@ public class CpAppDocumentLoader {
 
             for (Resource resource : sqlTemplates) {
                 String filename = resource.getFilename();
+                String grade = filename.substring(0, 2);
                 MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
                         .withHorizontalRuleCreateDocument(true)
                         .withIncludeCodeBlock(false)
                         .withIncludeBlockquote(false)
 //                    添加元数据
                         .withAdditionalMetadata("filename", filename)
+                        .withAdditionalMetadata("grade", grade)
                         .build();
 
 
                 MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
                 documents.addAll(reader.get());
             }
+
         } catch (
                 IOException e) {
             log.error("Error loading markdown files", e);
