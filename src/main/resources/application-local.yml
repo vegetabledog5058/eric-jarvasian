@@ -57,5 +57,6 @@ logging:
     com.eric.ericjarvasian.advisor: DEBUG
     org.springframework.ai.chat.client.advisor: DEBUG
 
-
+search-api:
+  key: k5jngEFEX65sCPbUxqCguWyz
 
