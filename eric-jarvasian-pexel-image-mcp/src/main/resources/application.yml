@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: eric-jarvasian-pexel-image-mcp
+  profiles:
+    active: stdio
+server:
+  port: 8127

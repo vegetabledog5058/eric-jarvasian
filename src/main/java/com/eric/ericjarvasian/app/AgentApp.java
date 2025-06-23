@@ -17,6 +17,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -180,19 +181,32 @@ public class AgentApp {
     }
 
     @Resource
-    private ToolCallback[] allTools;
+    private ToolCallback[] customToolCallbacks;
 
     public String chatWithTool(String message, String conversantId) {
         ChatResponse chatResponse = chatClient.prompt()
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .user(message)
-                .tools(allTools)
+                .tools(customToolCallbacks)
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
         return content;
     }
 
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider;
+    public String chatWithMcp(String message, String conversantId) {
+        ChatResponse chatResponse = chatClient.prompt()
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversantId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .user(message)
+                .tools(toolCallbackProvider)
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        return content;
+    }
 
 }

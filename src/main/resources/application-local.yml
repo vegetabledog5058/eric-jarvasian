@@ -18,6 +18,16 @@ spring:
 #        dimensions: 1536
 #        distance-type: COSINE_DISTANCE
 #        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
+    mcp:
+      client:
+#    sse 模式
+#        sse:
+#          connections:
+#            server1:
+#              url: http://localhost:8127
+#     stdio 模式
+        stdio:
+          servers-configuration: classpath:/mcp-servers-config.json
     dashscope:
       api-key: sk-34bb799af25340cb9bf73b84d6887fbd
       chat:
@@ -59,4 +69,5 @@ logging:
 
 search-api:
   key: k5jngEFEX65sCPbUxqCguWyz
+
 

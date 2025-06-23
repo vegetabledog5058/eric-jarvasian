@@ -81,4 +81,11 @@ class AgentAppTest {
         String res = agentApp.chatWithTool(message, conversantId.toString());
         assertNotNull( res);
     }
+
+    @Test
+    void chatWithMcp() {
+        String conversantId = UUID.randomUUID().toString();
+        String response = agentApp.chatWithMcp("给我搜索2张星空图片",  conversantId);
+        assertNotNull(response);
+    }
 }

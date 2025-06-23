@@ -12,7 +12,7 @@ public class ToolRegistration {
     private String apiKey;
 
     @Bean
-    public ToolCallback[] toolCallbacks() {
+    public ToolCallback[] customToolCallbacks() {
         FileOperationTool fileOperationTool = new FileOperationTool();
         WebSearchTool webSearchTool = new WebSearchTool(apiKey);
         WebScrapingTool webScrapingTool = new WebScrapingTool();
